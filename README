@@ -1,0 +1,9 @@
+PHPClassLib is a collection of PHP classes which allow you
+to augment your development toolbox with new functionality
+with as minimal inter-dependencies as possible.
+
+Included functionality
+------------------------
+
+Enum class - provides a PHP implementation of C style enums
+EnumIterator class - provides an interator to iterate all the members of an Enum type
