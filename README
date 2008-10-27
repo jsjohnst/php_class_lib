@@ -7,3 +7,4 @@ Included functionality
 
 Enum class - provides a PHP implementation of C style enums
 EnumIterator class - provides an interator to iterate all the members of an Enum type
+PlistParser class - provides an XML parser to parse Apple OS X plist files
