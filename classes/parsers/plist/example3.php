@@ -3,5 +3,7 @@
 include("PlistParser.inc");
 
 $parser = new plistParser();
-$plist = $parser->parseFile(dirname(__FILE__) . "/Info.plist");
+$data = implode('', file("iTunes.xml"));
+$plist = $parser->parseString($data);
+
 var_dump($plist);

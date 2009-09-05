@@ -2,12 +2,29 @@
 
 class plistParser extends XMLReader
 {
-	public function parse($file) {
+    public function parse($file) {
+        trigger_error(
+            'plistParser::parse() is deprecated, please use plistParser::parseFile()',
+            E_USER_NOTICE
+        );
+
+        return $this->parseFile($file);
+    }
+    
+    public function parseFile($file) {
 		if(basename($file) == $file) {
 			throw new Exception("Non-relative file path expected", 1);
 		}
 		$this->open("file://" . $file);
-		
+		return $this->process();
+	}
+
+    public function parseString($string) {
+        $this->XML($string);
+        return $this->process();
+    }
+
+    private function process() {
 		// plist's always start with a doctype, use it as a validity check
 		$this->read();
 		if($this->nodeType !== XMLReader::DOC_TYPE || $this->name !== "plist") {
@@ -33,7 +50,7 @@ class plistParser extends XMLReader
 		} else {
 			return $plist;
 		}
-	}
+    }
 
 	private function parse_node() {
 		// If not an element, nothing for us to do
