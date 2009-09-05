@@ -106,19 +106,18 @@ class plistParser extends XMLReader
 			$this->nextOfType(XMLReader::ELEMENT);
 			$array[$key] = $this->parse_node();
 			$this->nextOfType(XMLReader::ELEMENT, XMLReader::END_ELEMENT);
-		} while(!$this->isNodeOfTypeName(XMLReader::END_ELEMENT, "dict"));
+		} while($this->nodeType && !$this->isNodeOfTypeName(XMLReader::END_ELEMENT, "dict"));
 		return $array;
 	}
 	
 	private function parse_array() {
 		$array = array();
+        $this->nextOfType(XMLReader::ELEMENT);
 		do {
-			// find the first item of the array and append it onto the node list
-			$this->nextOfType(XMLReader::ELEMENT);
 			$array[] = $this->parse_node();
 			// skip over any whitespace
 			$this->nextOfType(XMLReader::ELEMENT, XMLReader::END_ELEMENT);
-		} while(!$this->isNodeOfTypeName(XMLReader::END_ELEMENT, "array"));
+		} while($this->nodeType && !$this->isNodeOfTypeName(XMLReader::END_ELEMENT, "array"));
 		return $array;
 	}
 	
@@ -134,7 +133,7 @@ class plistParser extends XMLReader
 		// skip to next
 		$this->read();
 		// check if it's one of the types requested and loop until it's one we want
-		while(!(in_array($this->nodeType, $types))) {
+		while($this->nodeType && !(in_array($this->nodeType, $types))) {
 			// node isn't of type requested, so keep going
 			$this->read();
 		}
