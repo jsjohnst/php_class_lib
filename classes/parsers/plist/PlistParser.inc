@@ -2,7 +2,6 @@
 
 class plistParser extends XMLReader
 {
-    var $filename;
     public function parse($file) {
         trigger_error(
             'plistParser::parse() is deprecated, please use plistParser::parseFile()',
