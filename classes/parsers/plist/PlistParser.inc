@@ -2,6 +2,7 @@
 
 class plistParser extends XMLReader
 {
+    var $filename;
     public function parse($file) {
         trigger_error(
             'plistParser::parse() is deprecated, please use plistParser::parseFile()',
@@ -15,12 +16,40 @@ class plistParser extends XMLReader
 		if(basename($file) == $file) {
 			throw new Exception("Non-relative file path expected", 1);
 		}
-		$this->open("file://" . $file);
-		return $this->process();
+        $string=file_get_contents($file,false,null,-1,8);
+        if ($string=="bplist00") {
+            return $this->binary2xml($file);
+        } else {
+		    $this->open("file://" . $file);
+		    return $this->process();
+        }
 	}
 
+    private function binary2xml($infile) {
+        if (file_exists("/usr/bin/plutil")===false) {
+            throw new Exception("converting binary plists requires plutil and /usr/bin/plutil does not appear to exist");
+        }
+        $tmpfile=tempnam("/tmp","plistParser");
+        $cmd=sprintf("/usr/bin/plutil -convert xml1 -o %s %s",escapeshellarg($tmpfile),escapeshellarg($infile));
+        $output=array();
+        exec($cmd,$output,$rc);
+        if ($rc>0) {
+            var_dump($cmd);
+            print_r($output);
+            throw new Exception("plutil failed");
+        }
+        $this->open("file://".$tmpfile);
+        unlink($tmpfile);
+        return $this->process();
+    }
     public function parseString($string) {
-        $this->XML($string);
+        if (substr($string,0.8)=="bplist00") {
+            $tmpfile=tempnam("/tmp","plistParser");
+            file_put_contents($tmpfile,$string);
+            return $this->binary2xml($file);
+        } else {
+            $this->XML($string);
+        }
         return $this->process();
     }
 
