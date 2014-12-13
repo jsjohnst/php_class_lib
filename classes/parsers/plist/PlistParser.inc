@@ -7,7 +7,6 @@ class plistParser extends XMLReader
             'plistParser::parse() is deprecated, please use plistParser::parseFile()',
             E_USER_NOTICE
         );
-
         return $this->parseFile($file);
     }
     
@@ -15,7 +14,10 @@ class plistParser extends XMLReader
 		if(basename($file) == $file) {
 			throw new Exception("Non-relative file path expected", 1);
 		}
-		$this->open("file://" . $file);
+		$fileData = file_get_contents("file://" .$file);
+		//replaces non self closing empty array elements with self closing elements
+		$fileData = preg_replace('/<array>\s+<\/array>/ism','<array />',$fileData);
+		$this->xml($fileData);
 		return $this->process();
 	}
 
@@ -79,7 +81,15 @@ class plistParser extends XMLReader
 				return false;
 				break;
 			case 'array':
-				return $this->parse_array();
+				//tests for empty arrays and gracefully moves on keeping the structure of the document intact.
+				$tmpAarrayTest = $this->readInnerXML();
+				$tmpAarrayTest = trim($tmpAarrayTest);
+				if (empty($tmpAarrayTest)) {
+					return array();
+				} else {
+					return $this->parse_array();
+				}
+				$tmpAarrayTest = null;
 				break;
 			case 'dict':
 				return $this->parse_dict();
